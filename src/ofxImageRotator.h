@@ -44,7 +44,7 @@ public:
     
     float smallRoundScale = 1.0;
     
-    void setup();
+    void setup(int imageSize = 512, int thumbSize = 128);
     void loadShader();
     void onReleased(string &message);
     void onDragged(string &message);

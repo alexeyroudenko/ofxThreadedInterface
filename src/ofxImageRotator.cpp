@@ -7,10 +7,12 @@
 
 #include "ofxImageRotator.h"
 
-void ofxImageRotator::setup() {
+void ofxImageRotator::setup(int imageSize, int thumbSize) {
     thumbMask.load("mask/thumb_mask.png");
     bigMask.load("mask/big_mask.png");
     loader.setup();
+    loader.loader->imageSize = imageSize;
+    loader.loader->thumbSize = thumbSize;
     loadShader();
 }
 
@@ -91,9 +93,8 @@ void ofxImageRotator::drawThumbs(bool bshader, float radiusSmalles) {
     int j = 0;
     int i = 0;
     float oneElementSize = (loader.loader->thumbSize + PADDING);
-    int radius = radiusSmalles * ofGetHeight() / 2.28;
-    
-    int count = loader.countToLoad; //loader.loader->thumbs.size();
+    int radius = radiusSmalles * (loader.loader->imageSize - loader.loader->thumbSize);
+    int count = loader.countToLoad;
     if (countPhotoesOnRound != -1) count = countPhotoesOnRound;
     
     for (int i = 0; i < loader.loader->thumbs.size(); i++) {
@@ -164,10 +165,6 @@ void ofxImageRotator::calculateTarget() {
     }
     current = getCurrent();
 }
-
-
-
-
 
 void ofxImageRotator::onMousePressed(ofMouseEventArgs& data) {
     ofLogVerbose("[ofxImageRotator]", "onMousePressed");
