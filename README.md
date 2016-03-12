@@ -2,7 +2,7 @@
 
 Interface with select concrete image, which load and resize images in thread
 
-![image](http://45.media.tumblr.com/2e0e744c643a959810a7b55c4b8d53dc/tumblr_o3xtvqfppC1sr1a7mo1_540.gif)
+![image](https://49.media.tumblr.com/a1795280f8cd2307deae5cd31f4c46b3/tumblr_o3xtvqfppC1sr1a7mo1_r1_540.gif)
 
 # Setup:
 Dependencies:
