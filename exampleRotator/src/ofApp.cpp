@@ -17,10 +17,10 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    ofClear(64);
+    ofClear(128);
     
     float roationSpeed = 12.0;
-    rotator.draw(true, 1.0, 0.0, 0.8);
+    rotator.draw(true, 1.0, roationSpeed, 0.8);
 }
 
 //--------------------------------------------------------------
