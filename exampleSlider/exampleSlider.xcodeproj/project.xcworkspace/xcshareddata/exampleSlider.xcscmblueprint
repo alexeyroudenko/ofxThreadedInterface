@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "75390B8E3CB430F914AB633B02C95E2F155745B0",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "75390B8E3CB430F914AB633B02C95E2F155745B0" : 0,
+    "E57B8E92CA68FA106301006280503EAA9837D684" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "B4E1B455-787F-40B8-9DA5-56B6056EDB19",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "75390B8E3CB430F914AB633B02C95E2F155745B0" : "ofxThreadedInterface\/",
+    "E57B8E92CA68FA106301006280503EAA9837D684" : "ofxThreadedGalleryLoader\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "exampleSlider",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "exampleSlider\/exampleSlider.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/alexeyroudenko\/ofxThreadedInterface.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "75390B8E3CB430F914AB633B02C95E2F155745B0"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/alexeyroudenko\/ofxThreadedGalleryLoader.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "E57B8E92CA68FA106301006280503EAA9837D684"
+    }
+  ]
+}
