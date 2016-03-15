@@ -1,6 +1,5 @@
 //
 //  ofxImageSlider.cpp
-//  PhotoBooth
 //
 //  Created by Alexey Rudenko on 3/26/13.
 //

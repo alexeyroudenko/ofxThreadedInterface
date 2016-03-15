@@ -6,7 +6,6 @@
 //
 
 #include "ofMain.h"
-#include "ofMain.h"
 
 class ofxImageSlider {
     
