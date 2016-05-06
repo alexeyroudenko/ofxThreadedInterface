@@ -1,5 +1,5 @@
 //
-//  ofxPhotoSlider.h
+//  ofxImageSlider.h
 //
 //  Created by Alexey Rudenko on 3/26/13.
 //

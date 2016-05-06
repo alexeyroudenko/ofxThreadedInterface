@@ -101,16 +101,12 @@ void ofxImageRotator::drawThumbs(bool bshader, float radiusSmalles) {
         alphas[i] += 0.09;
         alphas[i] = fmin(1.0, alphas[i]);
         alphas[i] = fmax(.0, alphas[i]);
-        
         int positionX = i * oneElementSize - position;
         float percents = (positionX + 1.0 * loader.loader->thumbSize * count) / (1.0 * count * loader.loader->thumbSize);
         float angle = percents * 2.0 * PI + PI / 2;
         int coordX = radius * cos(angle);
         int coordY = radius * sin(angle);
-        
         drawElement(&loader.loader->thumbs.at(i), coordX, coordY, alphas[i], bshader);
-        
-        ofSetHexColor(0xffffff);
     }
 }
 
@@ -118,7 +114,6 @@ void ofxImageRotator::drawElement(ofImage *image, int coordX, int coordY, float 
     ofPushMatrix();
     ofTranslate(coordX, coordY);
     ofScale(alpha, alpha);
-    
     if (bshader == true) {
         shader.begin();
         shader.setUniformTexture("maskTex", thumbMask.getTexture(), 1);
