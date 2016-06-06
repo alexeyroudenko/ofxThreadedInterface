@@ -12,16 +12,13 @@ class ofxImageSlider {
 public:
     
     void setup();
+    void setImgSize(int width, int height);
     void update();
     void draw();
     void draw(float x, float y);
-    
     void calculateTarget();
     void slideTo(int target);
     
-    float acceleration;
-    float speed;
-    float lastSpeed;
     
     unsigned int    current;
     float           position;
@@ -36,9 +33,17 @@ public:
     void onMouseDragged(ofMouseEventArgs& data);
     void onMouseReleased(ofMouseEventArgs& data);
     
+    void clear();
+    int getCurrent();
+    
+private:
+    
+    float acceleration;
+    float speed;
+    float lastSpeed;
     int dx = 0;
     int lastX = 0;
     
-    void clear();
-    int getCurrent();
+    int itemWidth = 720 / 2;
+    int itemHeight = 720 / 2;
 };
