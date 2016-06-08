@@ -16,14 +16,9 @@ public:
     void update();
     void draw();
     void draw(float x, float y);
-    void calculateTarget();
-    void slideTo(int target);
+    void slideTo(int target, bool fast = true);
     
-    
-    unsigned int    current;
-    float           position;
-    float           destination;
-    bool            isFree;
+    void drawDebug();
     
     std::vector<ofImage> *items;
     
@@ -36,7 +31,20 @@ public:
     void clear();
     int getCurrent();
     
+    float padding;
+    
+    void previous();
+    void next();
+    
 private:
+    
+    unsigned int currentIndex = 0;
+    unsigned int targetIndex = 0;
+    
+    float currentCoord;
+    float targetCoord;
+
+    bool isFree;
     
     float acceleration;
     float speed;

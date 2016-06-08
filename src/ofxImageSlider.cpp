@@ -13,18 +13,18 @@
 #define SPEED_FADE_OUT 0.9
 #define SHIFT_ANGLE 0
 #define ICO_SIZE 0.5
-#define PADDING 10
 
-//#define WIDTH 720 / 2
-//#define HEIGHT 720 / 2
 
 void ofxImageSlider::setup() {
     items = new std::vector<ofImage>();
-    position = 0;
-    destination = 0;
+    currentIndex = 0;
+    currentCoord = 0;
+    targetCoord = 0;
     speed = 0.0;
     acceleration = 0.99;
-    current = 0;
+    padding = 10;
+    isFree = true;
+    
 }
 
 void ofxImageSlider::setImgSize(int width, int height) {
@@ -32,64 +32,61 @@ void ofxImageSlider::setImgSize(int width, int height) {
     itemHeight = height;
 }
 
+
+void ofxImageSlider::slideTo(int target, bool fast) {
+    ofLogVerbose("ofxImageSlider", "slide to " + ofToString(target));
+    targetIndex = target;
+    targetCoord = target * (itemWidth + padding);
+
+    if (fast) {
+        currentIndex = target;
+        currentCoord = target * (itemWidth + padding);
+    }
+}
+
 void ofxImageSlider::update() {
-    calculateTarget();
+    
     if (items->size() == 0) {
-        position = 0;
+        currentCoord = 0;
         return;
     }
     
-//    int max = (items->size() - 1)* (WIDTH + PADDING);
-//    position = fmax(position, 0);
-//    position = fmin(max, position);
-    
-    if (isFree == true && fabs(speed) < SPEED_EDGE) {
-        position -= (1.0 * position - destination) / 25.0;
-    }
-    
     if (isFree == true) {
-        int max = (items->size() - 1) * (itemWidth + PADDING);
-        if (position < 0 && dx < 0) {
-            speed = speed / (-position * 0.5 + 1.0);
-        }
-        
-        if (position > max && dx > 0) {
-            speed = speed / ((position - max) * 0.5 + 1.0);
-        }
+        float fg = -0.007 * (currentCoord - targetCoord);
+        speed += fg;
     }
     
     speed *= SPEED_FADE_OUT;
-    position += speed;
+    currentCoord += speed;
     lastSpeed = speed;
 }
 
 int ofxImageSlider::getCurrent() {
-    return (int(round(position / (itemWidth + PADDING)))) % items->size();
+    if (items->size() == 0) return 0;
+    return (int(round(currentCoord / (itemWidth + padding)))) % items->size();
 }
 
-void ofxImageSlider::calculateTarget() {
-    if (items->size() == 0) {
-        destination = 0;
-        return;
+void ofxImageSlider::previous() {
+    ofLogVerbose("ofxImageSlider", "previous");
+    if (targetIndex > 0) {
+        slideTo(targetIndex - 1, false);
     }
-    
-    float value = position / (itemWidth + PADDING);
-    int intValue = floor(position / (itemWidth + PADDING));
-    
-    float delta = value - intValue;
-    
-    if (delta < 0.5) {
-        destination = intValue * (itemWidth + PADDING);
-    } else {
-        destination = (intValue + 1) * (itemWidth + PADDING);
-    }
-    
-    current = getCurrent();
 }
 
-void ofxImageSlider::slideTo(int target) {
-    position = target * (itemWidth + PADDING);
-    current = target;
+void ofxImageSlider::next() {
+    ofLogVerbose("ofxImageSlider", "next from target " + ofToString(targetIndex));
+    if (targetIndex < items->size() - 1) {
+        slideTo(targetIndex + 1, false);
+    }
+}
+
+void ofxImageSlider::drawDebug() {
+    stringstream info;
+    info << " currentIndex:" + ofToString(currentIndex) + " currentCoord:" + ofToString(currentCoord) + "\n";
+    info << " targetIndex:" + ofToString(targetIndex) + " targetCoord:" + ofToString(targetCoord) + "\n";
+    info << " count:" + ofToString(items->size()) + "\n";
+    info << " lastX:" + ofToString(lastX,0) + " dx:" + ofToString(dx,0) + " speed:" + ofToString(speed, 2);
+    ofDrawBitmapStringHighlight(info.str(), 40, ofGetHeight() - 60);
 }
 
 void ofxImageSlider::clear() {
@@ -98,15 +95,13 @@ void ofxImageSlider::clear() {
 }
 
 void ofxImageSlider::draw() {
-    float oneElementSize = (itemWidth + PADDING);
+    float oneElementSize = (itemWidth + padding);
     for (int i = 0; i < items->size(); i++) {
-        int positionX = i * oneElementSize - position;
+        int positionX = i * oneElementSize - currentCoord;
         float size = 1 / (positionX * positionX / 200000.0 + 1);
         int width = itemWidth * size;
         int height = itemHeight * size;
-        
-//        items->at(i).draw(i * oneElementSize - position - WIDTH / 2, - HEIGHT / 2, WIDTH, HEIGHT);
-        items->at(i).draw(i * oneElementSize - position - width / 2, - height / 2, width, height);
+        items->at(i).draw(i * oneElementSize - currentCoord - width / 2, - height / 2, width, height);
     }
 }
 
@@ -123,7 +118,6 @@ void ofxImageSlider::disableMouseEvents() {
 }
 
 void ofxImageSlider::onMousePressed(ofMouseEventArgs& data) {
-    
     if (data.y < 650) {
         isFree = false;
         lastX = data.x;
@@ -138,20 +132,24 @@ void ofxImageSlider::onMouseDragged(ofMouseEventArgs& data) {
         
         lastX = data.x;
         
-        int max = (items->size() - 1) * (itemWidth + PADDING);
-        if (position < 0 && dx < 0) {
-            dx = dx / (-position * 0.3 + 1.0);
+        int max = (items->size() - 1) * (itemWidth + padding);
+        if (currentCoord < 0 && dx < 0) {
+            dx = dx / (-currentCoord * 0.3 + 1.0);
         }
         
-        if (position > max && dx > 0) {
-            dx = dx / ((position - max) * 0.3 + 1.0);
+        if (currentCoord > max && dx > 0) {
+            dx = dx / ((currentCoord - max) * 0.3 + 1.0);
         }
 
-        if (lastX ) {
-            position += dx / 1.0;
+        if (lastX) {
+            currentCoord += dx / 1.0;
         }
         
         speed = dx / 1.0;
+        
+        currentIndex = getCurrent();
+        targetIndex = currentIndex;
+        targetCoord = targetIndex * (itemWidth + padding);
     }
 }
 
