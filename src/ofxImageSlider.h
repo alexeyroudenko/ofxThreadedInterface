@@ -1,3 +1,4 @@
+#pragma once
 //
 //  ofxImageSlider.h
 //
@@ -15,10 +16,11 @@ public:
     void setImgSize(int width, int height);
     void update();
     void draw();
-    void draw(float x, float y);
+    //void draw(float x, float y);
     void slideTo(int target, bool fast = true);
     
     void drawDebug();
+    string debugString();
     
     std::vector<ofImage> *items;
     
@@ -29,17 +31,25 @@ public:
     void onMouseReleased(ofMouseEventArgs& data);
     
     void clear();
+    
     int getCurrent();
+    int getPrevious();
     
     float padding;
-    
+    float maxY = 650;
     void previous();
     void next();
     
+    
+    ofEvent<string> onPhotoSelect;
+    
+    
 private:
     
+    int previousIndex = -1;
     unsigned int currentIndex = 0;
     unsigned int targetIndex = 0;
+    
     
     float currentCoord;
     float targetCoord;

@@ -8,12 +8,24 @@
 #include "ofxImageRotator.h"
 
 void ofxImageRotator::setup(int imageSize, int thumbSize) {
+    
     thumbMask.load("mask/thumb_mask.png");
     bigMask.load("mask/big_mask.png");
+    
     loader.setup();
-    loader.loader->imageSize = imageSize;
-    loader.loader->thumbSize = thumbSize;
+    loader.setSize(imageSize, thumbSize, true);
+    //loader.loader->imageSize = imageSize;
+    //loader.loader->thumbSize = thumbSize;
     loadShader();
+    
+    width = ofGetWidth();
+    height = ofGetHeight();
+    ofAddListener(ofEvents().windowResized, this, &ofxImageRotator::windowResized);
+}
+
+void ofxImageRotator::windowResized(ofResizeEventArgs &args) {
+    width = args.width;
+    height = args.height;
 }
 
 void ofxImageRotator::loadShader() {
@@ -28,6 +40,11 @@ void ofxImageRotator::loadShader() {
 #endif
 }
 
+void ofxImageRotator::updateMaskSize() {
+    bigMask.resize(loader.loader->imageSize, loader.loader->imageSize);
+    thumbMask.resize(loader.loader->thumbSize, loader.loader->thumbSize);
+}
+
 void ofxImageRotator::onReleased(string &message) {
     enableMouseEvents();
     currentDragged = -1;
@@ -39,12 +56,17 @@ void ofxImageRotator::onDragged(string &message) {
 }
 
 void ofxImageRotator::clear() {
+    current = 0;
     loader.clean();
 }
 
 void ofxImageRotator::reload(string directory, int count) {
+
+    int countLoading = loader.load(directory);
+    if (count == -1) {
+        count = countLoading;
+    }
     countPhotoesOnRound = count;
-    loader.load(directory);
 }
 
 void ofxImageRotator::update() {
@@ -52,25 +74,42 @@ void ofxImageRotator::update() {
 }
 
 int ofxImageRotator::getCenterX() {
-    return ofGetWidth() / 2;
+    return width / 2;
 }
 
 int ofxImageRotator::getCenterY() {
-    return ofGetHeight() / 2;
+    return height / 2;
 }
 
-void ofxImageRotator::draw(bool bshader, float size, float rotate, float radiusSmalles) {
+void ofxImageRotator::draw(bool bshader_, float size_, float rotate_, float radiusSmalles_) {
+    bshader = bshader_;
+    size = size_;
+    rotate = rotate_;
+    radiusSmalles = radiusSmalles_;
+    draw();
+}
+
+void ofxImageRotator::draw() {
+    
     // when testing dont loading images (config: test_skip_unarchive)
     if (loader.loader->items.size() > 0) {
         ofEnableAlphaBlending();
         
         ofPushMatrix();
         ofPoint imageSize = ofPoint(loader.loader->items.at(current).getWidth(), loader.loader->items.at(current).getHeight());
-        ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2);
+        ofTranslate(width / 2 + positionX, height / 2 + positionY);
         ofScale(size, size);
+
+        ofSetCircleResolution(64);
+        ofSetColor(255, 255 * bgAlpha);
+        ofDrawCircle(0, 0, imageSize.x * bgRadius);
+        ofSetColor(255);
+
         
         ofPushMatrix();
         ofTranslate(-imageSize.x / 2, -imageSize.y / 2);
+        
+        
         current = getCurrent();
         if (bshader == true) {
             shader.begin();
@@ -85,9 +124,10 @@ void ofxImageRotator::draw(bool bshader, float size, float rotate, float radiusS
         drawThumbs(bshader, radiusSmalles);
         ofPopMatrix();
     }
-    
-    speed += rotate * 0.01;
+    lastScale = size;
+    speed += rotate * 0.1;
 }
+
 
 void ofxImageRotator::drawThumbs(bool bshader, float radiusSmalles) {
     int j = 0;
@@ -120,7 +160,6 @@ void ofxImageRotator::drawElement(ofImage *image, int coordX, int coordY, float 
         shader.setUniform1f("alpha", alpha);
         image->draw(-loader.loader->thumbSize / 2, - loader.loader->thumbSize / 2);
         shader.end();
-        
     } else {
         image->draw(-loader.loader->thumbSize / 2, - loader.loader->thumbSize / 2);
     }
@@ -151,7 +190,16 @@ void ofxImageRotator::updateSlider() {
     float length = (loader.loader->thumbSize + PADDING) * loader.loader->items.size();
     if (position < 0) position += getLength();
     if (position > length) position -= getLength();
-    
+    string fileName = ofToString(current);
+    if (current != previousIndex) ofNotifyEvent(onPhotoSelect, fileName);
+    previousIndex = current;
+}
+
+void ofxImageRotator::moveTo(int index) {
+    ofLogVerbose("ofxImageRotator", "move " + ofToString(current) + ">" + ofToString(index));
+    speed+=4;
+    if (current > index) speed-=4;
+    current = index;
 }
 
 void ofxImageRotator::calculateTarget() {
@@ -161,22 +209,35 @@ void ofxImageRotator::calculateTarget() {
     current = getCurrent();
 }
 
+
+/* --------------------------------------------------------------
+ # Mouse
+ #
+ #
+ #
+ # -------------------------------------------------------------- */
 void ofxImageRotator::onMousePressed(ofMouseEventArgs& data) {
-    ofLogVerbose("[ofxImageRotator]", "onMousePressed");
-    isFree = false;
-    listenDragg = true;
-    lastAlpha = atan2(data.y - ofGetHeight() / 2, data.x - ofGetWidth() / 2) * 180.0 / PI;
+    ofVec2f d = ofVec2f(data.x - width / 2 - positionX, data.y - height / 2 - positionY);
+    if (d.length() < loader.loader->imageSize * lastScale * 1) {
+        //ofLogVerbose("" + ofToString(d.length()) + "<" + ofToString(loader.loader->imageSize) + "*" + ofToString(lastScale));
+        isFree = false;
+        listenDragg = true;
+        lastAlpha = atan2(data.y - height / 2 - positionY, data.x - width / 2 - positionX) * 180.0 / PI;
+    }
 }
 
 void ofxImageRotator::onMouseDragged(ofMouseEventArgs& data) {
     if (listenDragg == true) {
-        currentAlpha = atan2(data.y - ofGetHeight() / 2, data.x - ofGetWidth() / 2) * 180.0 / PI;
-        dalpha = lastAlpha - currentAlpha;
-        if (dalpha > 340) dalpha = 360.0 - dalpha;
-        if (dalpha < -340) dalpha = 360.0 + dalpha;
-        lastAlpha = currentAlpha;
-        position += dalpha * 3.0;
-        speed = 3.0 * dalpha / 1.0;
+        ofVec2f d = ofVec2f(data.x - width / 2 - positionX, data.y - height / 2 - positionY);
+        if (d.length() < loader.loader->imageSize * lastScale * 1) {
+            currentAlpha = atan2(data.y - height / 2 - positionY, data.x - width / 2 - positionX) * 180.0 / PI;
+            dalpha = lastAlpha - currentAlpha;
+            if (dalpha > 340) dalpha = 360.0 - dalpha;
+            if (dalpha < -340) dalpha = 360.0 + dalpha;
+            lastAlpha = currentAlpha;
+            position += dalpha * moveSpeed;
+            speed = 2.0 * moveSpeed * dalpha / 1.0;
+        }
     }
 }
 

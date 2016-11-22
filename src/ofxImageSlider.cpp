@@ -59,11 +59,15 @@ void ofxImageSlider::update() {
     speed *= SPEED_FADE_OUT;
     currentCoord += speed;
     lastSpeed = speed;
+    string fileName = ofToString(currentIndex);
+    if (currentIndex != previousIndex) ofNotifyEvent(onPhotoSelect, fileName);
+    previousIndex = currentIndex;
 }
 
 int ofxImageSlider::getCurrent() {
     if (items->size() == 0) return 0;
-    return (int(round(currentCoord / (itemWidth + padding)))) % items->size();
+    int current = (int(round(currentCoord / (itemWidth + padding)))) % items->size();
+    return current;
 }
 
 void ofxImageSlider::previous() {
@@ -80,13 +84,17 @@ void ofxImageSlider::next() {
     }
 }
 
-void ofxImageSlider::drawDebug() {
+string ofxImageSlider::debugString() {
     stringstream info;
     info << " currentIndex:" + ofToString(currentIndex) + " currentCoord:" + ofToString(currentCoord) + "\n";
     info << " targetIndex:" + ofToString(targetIndex) + " targetCoord:" + ofToString(targetCoord) + "\n";
     info << " count:" + ofToString(items->size()) + "\n";
     info << " lastX:" + ofToString(lastX,0) + " dx:" + ofToString(dx,0) + " speed:" + ofToString(speed, 2);
-    ofDrawBitmapStringHighlight(info.str(), 40, ofGetHeight() - 60);
+    return info.str();
+}
+
+void ofxImageSlider::drawDebug() {
+    ofDrawBitmapStringHighlight(debugString(), 40, ofGetHeight() - 60);
 }
 
 void ofxImageSlider::clear() {
@@ -109,6 +117,7 @@ void ofxImageSlider::enableMouseEvents() {
     ofAddListener(ofEvents().mousePressed, this, &ofxImageSlider::onMousePressed);
     ofAddListener(ofEvents().mouseDragged, this, &ofxImageSlider::onMouseDragged);
     ofAddListener(ofEvents().mouseReleased, this, &ofxImageSlider::onMouseReleased);
+    lastX = 0;
 }
 
 void ofxImageSlider::disableMouseEvents() {
@@ -118,15 +127,15 @@ void ofxImageSlider::disableMouseEvents() {
 }
 
 void ofxImageSlider::onMousePressed(ofMouseEventArgs& data) {
-    if (data.y < 650) {
+    if (data.y < maxY) {
         isFree = false;
         lastX = data.x;
     }
 }
 
 void ofxImageSlider::onMouseDragged(ofMouseEventArgs& data) {
-    if (data.y < 650) {
-        if (lastX && data.y < 650) {
+    if (data.y <maxY) {
+        if (lastX && data.y < maxY) {
             dx = lastX - data.x;
         }
         
@@ -142,10 +151,10 @@ void ofxImageSlider::onMouseDragged(ofMouseEventArgs& data) {
         }
 
         if (lastX) {
-            currentCoord += dx / 1.0;
+            currentCoord += dx / 2.0;
         }
         
-        speed = dx / 1.0;
+        speed = dx / 2.0;
         
         currentIndex = getCurrent();
         targetIndex = currentIndex;
@@ -154,6 +163,6 @@ void ofxImageSlider::onMouseDragged(ofMouseEventArgs& data) {
 }
 
 void ofxImageSlider::onMouseReleased(ofMouseEventArgs& data) {
-    if (data.y < 650)
+    if (data.y < maxY)
     isFree = true;
 }

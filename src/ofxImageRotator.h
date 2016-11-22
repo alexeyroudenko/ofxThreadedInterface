@@ -1,3 +1,5 @@
+#pragma once
+
 //
 //  ofxImageRotator.h
 //
@@ -18,29 +20,17 @@
 class ofxImageRotator {
     
 public:
-    bool scaling = false;
+    
+    ofParameter<float> bgRadius = 0.2;
+    ofParameter<float> bgAlpha = 0.2;
+    
+    ofxThreadGalleryLoader loader;
     
     ofShader shader;
     ofImage thumbMask;
     ofImage bigMask;
     
-    int currentDragged = -1;
-    bool isEnabled = true;
-    bool listenDragg = false;
-    int countPhotoesOnRound = 16;
-    float alphas[100];
-    
-    unsigned int    current = 0;
-    float lastAlpha;
-    float currentAlpha = 0;
-    float   dalpha = 0;
-    float   speed = 0.0;
-    float   lastSpeed = 0;
-    float   acceleration = 0.99;
-    float   position = 0;
-    bool    isFree = true;
-    
-    ofxThreadGalleryLoader loader;
+    ofEvent<string> onPhotoSelect;
     
     float smallRoundScale = 1.0;
     
@@ -49,11 +39,14 @@ public:
     void onReleased(string &message);
     void onDragged(string &message);
     void clear();
-    void reload(string directory, int count = 24);
+    void reload(string directory, int count = -1);
     void update();
+    
+    //bool bshader, float size = 1.0, float rotate = 0.0, float radiusSmalles = 1.0
     void draw(bool bshader, float size = 1.0, float rotate = 0.0, float radiusSmalles = 1.0);
-    void drawThumbs(bool bshader, float radiusSmalles);
-    void drawElement(ofImage *image, int coordX, int coordY, float alpha, bool bshader);
+    void draw();
+    
+    void updateMaskSize();
     
     int getCurrent();
     int getLength();
@@ -61,6 +54,10 @@ public:
     int getCenterY();
     
     void updateSlider();
+    
+    void moveTo(int index);
+    float   position = 0;
+    
     void calculateTarget();
 
     void enable();
@@ -72,4 +69,42 @@ public:
     void onMousePressed(ofMouseEventArgs& data);
     void onMouseDragged(ofMouseEventArgs& data);
     void onMouseReleased(ofMouseEventArgs& data);
+    void windowResized(ofResizeEventArgs &args);
+
+    float positionX = 0;
+    float positionY = 0;
+    
+    
+    bool bshader = true;
+    float size = 1.0;
+    float rotate = 0.0;
+    float radiusSmalles = 1;
+    
+    float moveSpeed = 1.0;
+
+private:
+    
+    unsigned int    current = 0;
+    int previousIndex = -1;
+    float lastAlpha;
+    float currentAlpha = 0;
+    float   dalpha = 0;
+    double   speed = 0.0;
+    float   lastSpeed = 0;
+    float   acceleration = 0.99;
+    bool    isFree = true;
+    
+    int currentDragged = -1;
+    bool isEnabled = true;
+    bool listenDragg = false;
+    int countPhotoesOnRound = 16;
+    float alphas[100];
+    float lastScale = 1.0;
+    
+    void drawThumbs(bool bshader, float radiusSmalles);
+    void drawElement(ofImage *image, int coordX, int coordY, float alpha, bool bshader);
+    
+    int width;
+    int height;
+
 };

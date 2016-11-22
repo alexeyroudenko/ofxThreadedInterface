@@ -19,7 +19,7 @@ void ofApp::update(){
 void ofApp::draw(){
     ofClear(128);
     
-    float roationSpeed = 12.0;
+    float roationSpeed = 0.0;
     rotator.draw(true, 1.0, roationSpeed, 1.0);
 }
 
