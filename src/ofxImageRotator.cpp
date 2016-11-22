@@ -81,10 +81,10 @@ int ofxImageRotator::getCenterY() {
     return height / 2;
 }
 
-void ofxImageRotator::draw(bool bshader_, float size_, float rotate_, float radiusSmalles_) {
+void ofxImageRotator::draw(bool bshader_, float size_, float autoRotateSpeed_, float radiusSmalles_) {
     bshader = bshader_;
     size = size_;
-    rotate = rotate_;
+    autoRotateSpeed = autoRotateSpeed_;
     radiusSmalles = radiusSmalles_;
     draw();
 }
@@ -125,7 +125,7 @@ void ofxImageRotator::draw() {
         ofPopMatrix();
     }
     lastScale = size;
-    speed += rotate * 0.1;
+    speed += autoRotateSpeed * 0.1;
 }
 
 
@@ -183,7 +183,17 @@ void ofxImageRotator::updateSlider() {
         return;
     }
     
-    speed *= SPEED_FADE_OUT;
+    
+    if (abs(speed) > autoRotateSpeed) {
+        speed *= SPEED_FADE_OUT;
+    } else {
+        if (autoRotateSpeed > 0) {
+            speed = fmax(speed, autoRotateSpeed);
+        } else {
+            speed = fmin(speed, autoRotateSpeed);
+        }
+    }
+    
     position += speed;
     lastSpeed = speed;
     

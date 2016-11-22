@@ -77,10 +77,10 @@ public:
     
     bool bshader = true;
     float size = 1.0;
-    float rotate = 0.0;
+    double autoRotateSpeed = 0.0;
     float radiusSmalles = 1;
     
-    float moveSpeed = 1.0;
+    double moveSpeed = 1.0;
 
 private:
     
@@ -90,7 +90,7 @@ private:
     float currentAlpha = 0;
     float   dalpha = 0;
     double   speed = 0.0;
-    float   lastSpeed = 0;
+    double   lastSpeed = 0;
     float   acceleration = 0.99;
     bool    isFree = true;
     
