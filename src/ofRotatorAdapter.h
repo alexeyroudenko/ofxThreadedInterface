@@ -27,6 +27,9 @@ public:
     ofParameter<bool>   doSwitchExamples;
     ofParameter<float>   autoSwitchFrames;
     
+    ofParameter<float>   panelX;
+    ofParameter<float>   panelY;
+    
     void setup() {
         settings.setName("Rotator");
         settings.add(smallRadius.set("smallRadius", 0.5, 0., 1.));
@@ -38,6 +41,9 @@ public:
         settings.add(waitFrames.set("waitFrames", 10., 0., 200.));
         settings.add(doRotate.set("doRotate", true));
         settings.add(interfaceR.set("autoRotate", 0.1, -2, 2));
+        
+        settings.add(panelX.set("panelX", 0.1, 0.0, 1.0));
+        settings.add(panelY.set("panelY", 0.1, 0.0, 1.0));
         
         rotator.setup();
     }
